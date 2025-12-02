@@ -1,27 +1,33 @@
-mod yt_dlp;
-use yt_dlp::ensure_and_download;
-use fltk::{app, button::Button, frame::Frame, input::Input, prelude::*, window::Window};
-use fltk_theme::{WidgetScheme, SchemeType};
+mod ui;
+use ui::{Router, Route};
+
+use fltk::app;
+use fltk::prelude::*;
+use fltk::window::DoubleWindow;
+use std::rc::Rc;
+use std::cell::RefCell;
+use std::time::Duration;
 
 fn main() {
-    let app = app::App::default().with_scheme(app::Scheme::Gtk);
-    let widget_scheme = WidgetScheme::new(SchemeType::Aqua);
-    widget_scheme.apply();
-    let mut wind = Window::new(100, 100, 500, 250, "yt-dlp GUI");
-    
-    let mut input = Input::new(50, 50, 400, 40, "Search:");
-    let mut frame = Frame::new(50, 150, 400, 40, "Ready");
-    let mut btn = Button::new(200, 110, 100, 30, "Download");
+    let app = app::App::default();
+    let mut wind = DoubleWindow::new(100, 100, 500, 300, "yt-dlp GUI");
 
-    btn.set_callback(move |_| {
-        let keyword = input.value();
-        match ensure_and_download(&keyword) {
-            Ok(_) => frame.set_label("Download OK"),
-            Err(e) => frame.set_label(&format!("Error: {}", e)),
-        }
-    });
+    // Router 생성
+    let router = Rc::new(RefCell::new(ui::Router::new()));
 
     wind.end();
     wind.show();
+
+    // 처음에는 Splash 화면
+    router.borrow_mut().navigate(Route::Splash);
+
+    // 2초 후 Home 화면으로 전환
+    {
+        let router_clone = router.clone();
+        app::add_timeout3(2.0, move |_| {
+            router_clone.borrow_mut().navigate(Route::Home);
+        });
+    }
+
     app.run().unwrap();
 }
