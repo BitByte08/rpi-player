@@ -1,0 +1,19 @@
+{
+  "name": "rpi-player-server",
+  "version": "1.0.0",
+  "main": "server.js",
+  "scripts": {
+    "start": "ts-node server.ts"
+  },
+  "dependencies": {
+    "express": "^5.2.1",
+    "yt-search": "^2.13.1"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.3",
+    "ts-node": "^10.9.2",
+    "@types/express": "^5.0.6",
+    "@types/node": "^24.10.1",
+    "@types/yt-search": "^2.10.3"
+  }
+}
