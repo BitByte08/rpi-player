@@ -1,6 +1,9 @@
 mod ui;
 use ui::{Router, Route};
 
+mod yt_dlp;
+use yt_dlp::{init};
+
 use fltk::app;
 use fltk::prelude::*;
 use fltk::window::DoubleWindow;
@@ -20,7 +23,10 @@ fn main() {
 
     // 처음에는 Splash 화면
     router.borrow_mut().navigate(Route::Splash);
-
+    match init::Init::ensure() {
+        Ok(_) => println!("Initialization complete."),
+        Err(e) => eprintln!("Error during init: {}", e),
+    }
     // 2초 후 Home 화면으로 전환
     {
         let router_clone = router.clone();

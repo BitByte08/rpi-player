@@ -4,6 +4,7 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
+dirs = "5.0"
 fltk = { version = "1.4", features = ["fltk-bundled"] }
 fltk-theme = "0.7"
 reqwest = { version = "0.11", features = ["blocking", "json"] }
