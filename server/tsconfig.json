@@ -10,6 +10,8 @@
     "skipLibCheck": true,
     "sourceMap": true,
     "declaration": true,
-    "declarationMap": true
-  }
+    "declarationMap": true,
+    "outDir": "dist"           // 여기에 빌드 결과가 들어감
+  },
+  "include": ["server.ts"]     // 빌드할 파일 지정
 }
