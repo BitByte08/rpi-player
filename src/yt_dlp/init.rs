@@ -1,60 +1,63 @@
 use std::fs;
 use std::path::PathBuf;
 use std::process::Command;
+use crate::yt_dlp::YtDlp;
 
-/// 설치된 yt-dlp 경로 반환
-pub fn get_path() -> Result<PathBuf, String> {
-    let path = dirs::home_dir()
-        .ok_or("Cannot determine home directory")?
-        .join(".local/bin/yt-dlp");
+impl YtDlp {
+    /// 설치된 yt-dlp 경로 반환
+    pub fn get_path() -> Result<PathBuf, String> {
+        let path = dirs::home_dir()
+            .ok_or("Cannot determine home directory")?
+            .join(".local/bin/yt-dlp");
 
-    if path.exists() {
-        Ok(path)
-    } else {
-        Err("yt-dlp binary not found in ~/.local/bin".into())
-    }
-}
-
-/// yt-dlp 설치 여부 확인
-pub fn check() -> bool {
-    get_path().is_ok()
-}
-
-/// 바이너리 다운로드 및 설치
-pub fn install() -> Result<PathBuf, String> {
-    let dir = dirs::home_dir()
-        .ok_or("Cannot determine home directory")?
-        .join(".local/bin");
-
-    fs::create_dir_all(&dir).map_err(|e| e.to_string())?;
-
-    let out_path = dir.join("yt-dlp");
-    if !out_path.exists() {
-        println!("Downloading yt-dlp...");
-        let url = "https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp";
-        let response = reqwest::blocking::get(url).map_err(|e| e.to_string())?;
-        let bytes = response.bytes().map_err(|e| e.to_string())?;
-        fs::write(&out_path, &bytes).map_err(|e| e.to_string())?;
-
-        // 실행 권한 부여
-        Command::new("chmod")
-            .arg("a+rx")
-            .arg(&out_path)
-            .status()
-            .map_err(|e| e.to_string())?;
-        println!("yt-dlp installed at ~/.local/bin/yt-dlp");
+        if path.exists() {
+            Ok(path)
+        } else {
+            Err("yt-dlp binary not found in ~/.local/bin".into())
+        }
     }
 
-    Ok(out_path)
-}
+    /// yt-dlp 설치 여부 확인
+    pub fn check() -> bool {
+        YtDlp::get_path().is_ok()
+    }
 
-/// 설치 확인 후 필요 시 설치
-pub fn ensure() -> Result<PathBuf, String> {
-    if check() {
-        println!("yt-dlp is Installed");
-        get_path()
-    } else {
-        println!("yt-dlp not found. Installing...");
-        install()
+    /// 바이너리 다운로드 및 설치
+    pub fn install() -> Result<PathBuf, String> {
+        let dir = dirs::home_dir()
+            .ok_or("Cannot determine home directory")?
+            .join(".local/bin");
+
+        fs::create_dir_all(&dir).map_err(|e| e.to_string())?;
+
+        let out_path = dir.join("yt-dlp");
+        if !out_path.exists() {
+            println!("Downloading yt-dlp...");
+            let url = "https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp";
+            let response = reqwest::blocking::get(url).map_err(|e| e.to_string())?;
+            let bytes = response.bytes().map_err(|e| e.to_string())?;
+            fs::write(&out_path, &bytes).map_err(|e| e.to_string())?;
+
+            // 실행 권한 부여
+            Command::new("chmod")
+                .arg("a+rx")
+                .arg(&out_path)
+                .status()
+                .map_err(|e| e.to_string())?;
+            println!("yt-dlp installed at ~/.local/bin/yt-dlp");
+        }
+
+        Ok(out_path)
+    }
+
+    /// 설치 확인 후 필요 시 설치
+    pub fn ensure() -> Result<PathBuf, String> {
+        if YtDlp::check() {
+            println!("yt-dlp is Installed");
+            YtDlp::get_path()
+        } else {
+            println!("yt-dlp not found. Installing...");
+            YtDlp::install()
+        }
     }
 }
